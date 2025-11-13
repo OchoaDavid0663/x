@@ -1,0 +1,71 @@
+{% extends 'app_Similares/base.html' %}
+
+{% block title %}Agregar Venta - Similares{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm mx-auto" style="max-width: 800px;">
+        <div class="card-header bg-info text-white">
+            <h3 class="mb-0"><i class="fas fa-cart-plus me-2"></i> Registrar Nueva Venta</h3>
+        </div>
+        <div class="card-body">
+            {% if error_message %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_message }}
+            </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="cliente" class="form-label">Cliente:</label>
+                    <select class="form-select" id="cliente" name="cliente" required>
+                        <option value="">Selecciona un cliente...</option>
+                        {% for cliente_obj in clientes %}
+                        <option value="{{ cliente_obj.pk }}" {% if cliente_obj.pk|stringformat:"s" == selected_cliente %}selected{% endif %}>
+                            {{ cliente_obj.nombre }} {{ cliente_obj.apellido }} ({{ cliente_obj.email }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="medicamentos" class="form-label">Medicamentos (selección múltiple):</label>
+                    <select class="form-select" id="medicamentos" name="medicamentos" multiple required size="7">
+                        {% for medicamento_obj in medicamentos %}
+                        <option value="{{ medicamento_obj.pk }}" 
+                            {% if medicamento_obj.pk|stringformat:"s" in selected_medicamentos_ids %}selected{% endif %}>
+                            {{ medicamento_obj.nombre }} - {{ medicamento_obj.laboratorio }} (${{ medicamento_obj.precio|floatformat:2 }}) [Stock: {{ medicamento_obj.stock }}]
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">Mantén `Ctrl` (Windows) o `Cmd` (Mac) para seleccionar múltiples medicamentos.</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="metodo_pago" class="form-label">Método de Pago:</label>
+                        <select class="form-select" id="metodo_pago" name="metodo_pago" required>
+                            <option value="">Selecciona un método...</option>
+                            {% for choice_value, choice_label in metodos_pago %}
+                            <option value="{{ choice_value }}" {% if choice_value == selected_metodo_pago %}selected{% endif %}>
+                                {{ choice_label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="numero_factura" class="form-label">Número de Factura:</label>
+                        <input type="text" class="form-control" id="numero_factura" name="numero_factura" value="{{ numero_factura|default_if_none:'' }}" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="observaciones" class="form-label">Observaciones:</label>
+                    <textarea class="form-control" id="observaciones" name="observaciones" rows="3">{{ observaciones|default_if_none:'' }}</textarea>
+                </div>
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-info btn-lg text-white"><i class="fas fa-check-circle me-2"></i> Registrar Venta</button>
+                    <a href="{% url 'ver_ventas' %}" class="btn btn-secondary btn-lg"><i class="fas fa-arrow-left me-2"></i> Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
